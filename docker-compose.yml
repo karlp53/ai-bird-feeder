@@ -1,0 +1,44 @@
+services:
+  frigate:
+    container_name: frigate
+    restart: unless-stopped
+    stop_grace_period: 30s
+    image: ghcr.io/blakeblackshear/frigate:stable
+    shm_size: 128m
+    volumes:
+      - ./frigate/config:/config
+      - ./frigate/storage:/media/frigate
+      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      #- "8971:8971" # TLS port
+      - "5000:5000"
+      - "8554:8554" # RTSP feeds
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+
+  whosatmyfeeder:
+    container_name: whosatmyfeeder
+    restart: unless-stopped
+    image: mmcc73/whosatmyfeeder:latest
+    volumes:
+      - ./whosatmyfeeder/config:/config
+      - ./whosatmyfeeder/data:/data
+    ports:
+      - 7766:7766
+    environment:
+      - TZ=America/Denver
+
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883" # Standard MQTT port
+      - "9001:9001" # Websocket port
+    volumes:
+      - ./mosquitto/config:/mosquitto/config:ro
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
