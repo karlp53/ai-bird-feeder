@@ -1,1 +1,17 @@
-
+frigate:
+  #frigate_url: https://192.168.0.11:8971
+  frigate_url: http://192.168.0.11:5000
+  mqtt_server: 192.168.0.12
+  mqtt_auth: false
+  mqtt_username: mqtt
+  mqtt_password: passw0rd
+  main_topic: frigate
+  camera:
+    - bird
+  object: bird
+classification:
+  model: model.tflite
+  threshold: 0.7
+webui:
+  port: 7766
+  host: 0.0.0.0
