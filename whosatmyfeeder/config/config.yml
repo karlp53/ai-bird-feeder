@@ -4,7 +4,7 @@ frigate:
   mqtt_server: 192.168.0.12
   mqtt_auth: false
   mqtt_username: mqtt
-  mqtt_password: passw0rd
+  mqtt_password: <passwd>
   main_topic: frigate
   camera:
     - bird
