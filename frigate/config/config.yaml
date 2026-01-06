@@ -1,1 +1,62 @@
+mqtt:
+  host: 192.168.0.12
+  port: 1883
+  topic_prefix: frigate
+  user: mqtt
+  password: <passwd>
+  stats_interval: 60
 
+classification:
+  bird:
+    enabled: false
+
+detectors:
+  openvino_detector:
+    type: openvino
+    device: GPU
+
+tls:
+  enabled: false
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  path: /openvino-model/ssdlite_mobilenet_v2.xml
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+ffmpeg:
+  hwaccel_args: preset-vaapi
+  output_args:
+    record: preset-record-generic-audio-aac
+
+objects:
+  track:
+    - bird
+
+snapshots:
+  enabled: true
+  timestamp: true
+  bounding_box: false
+
+cameras:
+  bird:
+    enabled: true
+    ffmpeg:
+      inputs:
+        - path: rtsp://<user>:<passwd>@192.168.0.150:554/stream0
+          roles:
+            - detect
+            - record
+    detect:
+      enabled: true
+    record:
+      enabled: true
+
+    mqtt:
+      enabled: true
+      bounding_box: false 
+      timestamp: false 
+      quality: 95
+version: 0.16-0
