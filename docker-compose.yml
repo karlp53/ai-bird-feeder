@@ -1,4 +1,73 @@
 services:
+  yawamf-backend:
+    image: ghcr.io/jellman86/wamf-backend:latest
+    #image: ghcr.io/jellman86/wamf-backend:dev
+    container_name: yawamf-backend
+    restart: unless-stopped
+    user: "${PUID:-1000}:${PGID:-1000}"
+    networks:
+      - yawamf_network
+      - my-feeder
+    volumes:
+      - ./ya-wamf/config:/config        # Configuration files (config.json)
+      - ./ya-wamf/data:/data            # Persistent data (database, models)
+      - ./ya-wamf/data/models:/app/assets            # Workaround for model path bug
+    ports:
+      - "8946:8000"
+    environment:
+      - TZ=${TZ:-UTC}
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - FRIGATE__FRIGATE_URL=${FRIGATE_URL:-http://frigate:5000}
+      - FRIGATE__FRIGATE_AUTH_TOKEN=${FRIGATE_AUTH_TOKEN:-}
+      - FRIGATE__MQTT_SERVER=${MQTT_SERVER:-mqtt}
+      - FRIGATE__MQTT_PORT=${MQTT_PORT:-1883}
+      - FRIGATE__MQTT_AUTH=${MQTT_AUTH:-false}
+      - FRIGATE__MQTT_USERNAME=${MQTT_USERNAME:-}
+      - FRIGATE__MQTT_PASSWORD=${MQTT_PASSWORD:-}
+      - SYSTEM__DEBUG_UI_ENABLED=${DEBUG_UI_ENABLED:-false}
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  yawamf-frontend:
+    image: ghcr.io/jellman86/wamf-frontend:latest
+    #image: ghcr.io/jellman86/wamf-frontend:dev
+    container_name: yawamf-frontend
+    restart: unless-stopped
+    user: "${PUID:-1000}:${PGID:-1000}"
+    networks:
+      - yawamf_network
+    ports:
+      - "9852:80"
+    depends_on:
+      - yawamf-backend
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  ## Audio Analysis (Optional) - Uncomment to run a local BirdNET-Go instance
+  birdnet-go:
+    image: ghcr.io/tphakala/birdnet-go:latest
+    container_name: birdnet-go
+    restart: unless-stopped
+    networks:
+      - yawamf_network
+    volumes:
+      - ./ya-wamf/config/birdnet:/config
+      - ./ya-wamf/data/birdnet:/data
+    environment:
+      - MQTT_SERVER=${MQTT_SERVER:-mqtt}
+      - MQTT_PORT=${MQTT_PORT:-1883}
+      - RTSP_URL=rtsp://per:Passw0rd**@192.168.0.150:554/stream0 # Replace with your camera stream
+    ports:
+      - "8080:8080"
+
+  ## Frigate ##
   frigate:
     container_name: frigate
     restart: unless-stopped
@@ -18,7 +87,10 @@ services:
       - "8554:8554" # RTSP feeds
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
+    networks:
+      - my-feeder
 
+  ## Original WhosAtMyFeeder ##
   whosatmyfeeder:
     container_name: whosatmyfeeder
     restart: unless-stopped
@@ -27,10 +99,13 @@ services:
       - ./whosatmyfeeder/config:/config
       - ./whosatmyfeeder/data:/data
     ports:
-      - 7766:7766
+      - "7766:7766"
     environment:
       - TZ=America/Denver
+    networks:
+      - my-feeder
 
+  ## MQTT ##
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto
@@ -42,3 +117,13 @@ services:
       - ./mosquitto/config:/mosquitto/config:ro
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
+    networks:
+      - my-feeder
+
+networks:
+  yawamf_network:
+    name: ${DOCKER_NETWORK:-yawamf_default}
+    external: true
+  my-feeder:
+    name: ${DOCKER_NETWORK:-my-feeder}
+    external: true
