@@ -1,0 +1,205 @@
+{
+  "frigate": {
+    "frigate_url": "http://192.168.0.11:5000",
+    "frigate_auth_token": "",
+    "main_topic": "frigate",
+    "camera": [],
+    "clips_enabled": true,
+    "mqtt_server": "192.168.0.12",
+    "mqtt_port": 1883,
+    "mqtt_auth": false,
+    "mqtt_username": "",
+    "mqtt_password": "",
+    "birdnet_enabled": true,
+    "audio_topic": "birdnet/text",
+    "camera_audio_mapping": {},
+    "audio_buffer_hours": 24,
+    "audio_correlation_window_seconds": 300
+  },
+  "classification": {
+    "model": "model.tflite",
+    "threshold": 0.8,
+    "min_confidence": 0.6,
+    "blocked_labels": [],
+    "unknown_bird_labels": [
+      "background",
+      "Background"
+    ],
+    "trust_frigate_sublabel": true,
+    "display_common_names": true,
+    "scientific_name_primary": false,
+    "auto_video_classification": true,
+    "video_classification_delay": 30,
+    "video_classification_max_retries": 3,
+    "video_classification_retry_interval": 15,
+    "video_classification_max_concurrent": 5,
+    "video_classification_failure_threshold": 5,
+    "video_classification_failure_window_minutes": 10,
+    "video_classification_failure_cooldown_minutes": 15,
+    "video_classification_timeout_seconds": 180,
+    "video_classification_stale_minutes": 15,
+    "max_classification_results": 5,
+    "wildlife_model": "wildlife_model.tflite",
+    "wildlife_labels": "wildlife_labels.txt"
+  },
+  "maintenance": {
+    "retention_days": 90,
+    "cleanup_enabled": true,
+    "auto_delete_missing_clips": false
+  },
+  "media_cache": {
+    "enabled": true,
+    "cache_snapshots": true,
+    "cache_clips": true,
+    "retention_days": 0
+  },
+  "location": {
+    "latitude": null,
+    "longitude": null,
+    "automatic": true,
+    "temperature_unit": "fahrenheit"
+  },
+  "birdweather": {
+    "enabled": false,
+    "station_token": null
+  },
+  "ebird": {
+    "enabled": false,
+    "api_key": null,
+    "default_radius_km": 25,
+    "default_days_back": 14,
+    "max_results": 25,
+    "locale": "en"
+  },
+  "inaturalist": {
+    "enabled": false,
+    "client_id": null,
+    "client_secret": null,
+    "default_latitude": null,
+    "default_longitude": null,
+    "default_place_guess": ""
+  },
+  "enrichment": {
+    "mode": "per_enrichment",
+    "single_provider": "wikipedia",
+    "summary_source": "wikipedia",
+    "taxonomy_source": "inaturalist",
+    "sightings_source": "disabled",
+    "seasonality_source": "inaturalist",
+    "rarity_source": "disabled",
+    "links_sources": [
+      "wikipedia",
+      "inaturalist"
+    ]
+  },
+  "llm": {
+    "enabled": false,
+    "provider": "gemini",
+    "api_key": null,
+    "model": "gemini-2.5-flash-lite",
+    "analysis_prompt_template": "You are an expert ornithologist and naturalist.\n{frame_note}\n\nSpecies identified by system: {species}\nTime of detection: {time}\n{weather_str}\n\nRespond in Markdown with these exact section headings. Under each heading, write 1 short paragraph (no bullet lists):\n## Appearance\n## Behavior\n## Naturalist Note\n## Seasonal Context\n\nKeep the response concise (under 200 words). No extra sections.\n{language_note}",
+    "conversation_prompt_template": "You are an expert ornithologist and naturalist. Continue a short Q&A about this detection.\n\nSpecies identified by system: {species}\nPrevious analysis:\n{analysis}\n\nConversation so far:\n{history}\n\nUser question: {question}\n\nAnswer concisely in Markdown using the same headings as the analysis (## Appearance, ## Behavior, ## Naturalist Note, ## Seasonal Context).\nUnder each heading, write 1 short paragraph (no bullet lists). If a section is not relevant, write \"Not observed.\"\n{language_note}",
+    "chart_prompt_template": "You are a data analyst for bird feeder activity.\nYou are looking at a chart of detections over time.\n\nTimeframe: {timeframe}\nTotal detections in range: {total_count}\nSeries shown: {series}\n{weather_notes}\n{sun_notes}\n\nRespond in Markdown with these exact section headings and short bullet points:\n## Overview\n## Patterns\n## Weather Correlations\n## Notable Spikes/Dips\n## Caveats\n\nKeep it concise (under 200 words). No extra sections.\n{language_note}\n{notes}"
+  },
+  "telemetry": {
+    "enabled": false,
+    "url": "https://yawamf-telemetry.ya-wamf.workers.dev/heartbeat",
+    "installation_id": "fa447193-7a65-48a7-8d4f-5b7e34f2b4b4"
+  },
+  "notifications": {
+    "discord": {
+      "enabled": false,
+      "webhook_url": null,
+      "username": "YA-WAMF",
+      "include_snapshot": true
+    },
+    "pushover": {
+      "enabled": false,
+      "user_key": null,
+      "api_token": null,
+      "priority": 0,
+      "include_snapshot": true
+    },
+    "telegram": {
+      "enabled": false,
+      "bot_token": null,
+      "chat_id": null,
+      "include_snapshot": true
+    },
+    "email": {
+      "enabled": false,
+      "only_on_end": false,
+      "use_oauth": false,
+      "oauth_provider": null,
+      "gmail_client_id": null,
+      "gmail_client_secret": null,
+      "outlook_client_id": null,
+      "outlook_client_secret": null,
+      "smtp_host": "",
+      "smtp_port": 587,
+      "smtp_username": "",
+      "smtp_password": null,
+      "smtp_use_tls": true,
+      "from_email": "",
+      "to_email": "",
+      "include_snapshot": true,
+      "dashboard_url": ""
+    },
+    "filters": {
+      "species_whitelist": [],
+      "min_confidence": 0.7,
+      "audio_confirmed_only": false,
+      "camera_filters": {}
+    },
+    "notification_language": "en",
+    "mode": "standard",
+    "notify_on_insert": true,
+    "notify_on_update": false,
+    "delay_until_video": false,
+    "video_fallback_timeout": 45,
+    "notification_cooldown_minutes": 0
+  },
+  "accessibility": {
+    "high_contrast": false,
+    "dyslexia_font": false,
+    "reduced_motion": false,
+    "zen_mode": false,
+    "live_announcements": true
+  },
+  "appearance": {
+    "font_theme": "classic"
+  },
+  "system": {
+    "broadcaster_max_queue_size": 100,
+    "broadcaster_max_consecutive_full": 10,
+    "trusted_proxy_hosts": [
+      "172.20.0.7",
+      "nginx-rp",
+      "cloudflare-tunnel"
+    ],
+    "debug_ui_enabled": false
+  },
+  "auth": {
+    "enabled": false,
+    "username": "admin",
+    "password_hash": null,
+    "session_secret": "RZAEzq1rrwrpTXzTW02KKGAigziBqOoeK4CeKzZt4n0",
+    "session_expiry_hours": 168
+  },
+  "public_access": {
+    "enabled": false,
+    "show_camera_names": true,
+    "show_ai_conversation": false,
+    "allow_clip_downloads": false,
+    "historical_days_mode": "retention",
+    "show_historical_days": 7,
+    "media_days_mode": "retention",
+    "media_historical_days": 7,
+    "rate_limit_per_minute": 30,
+    "external_base_url": null
+  },
+  "species_info_source": "auto",
+  "date_format": "dmy",
+  "log_level": "INFO",
+  "api_key": null
+}
